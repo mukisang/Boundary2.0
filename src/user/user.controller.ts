@@ -1,7 +1,31 @@
-import { Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { UserService } from './user.service';
+import { User } from './interface/user.interface';
+import { UserEntity } from './entity/user.entity';
 
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
+
+  @Post('signup')
+  signUp(@Body() user: User) {
+    this.userService.create(user);
+    return 'complete done';
+  }
+
+  @Post('signin')
+  signIn(
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ): Promise<User> {
+    return this.userService.find(email, password);
+  }
+
+  @Post('signout')
+  signOut(): string {
+    return '3';
+  }
+
   @Get('/')
   showMyProfile() {
     return 'my profile';
