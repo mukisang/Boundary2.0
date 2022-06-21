@@ -28,19 +28,20 @@ export class UserController {
   }
 
   @Get('/')
-  showMyProfile() {
-    return 'my profile';
+  showMyProfile(): Promise<UserResDTO> {
+    const email = '1';
+    return this.userService.find(email);
   }
 
-  @Get('/:id')
-  showOthersProfile(@Param('id') id: string): string {
-    console.log(id);
-    return id;
+  @Get('/:email')
+  showOthersProfile(@Param('email') email: string): Promise<UserResDTO> {
+    return this.userService.find(email);
   }
 
-  @Put('/:email')
-  editProfileNickName(@Param('email') email: string): string {
-    return email + 'modifiyed';
+  @Put('/')
+  editNickName(@Body('nickname') nickname: string): Promise<UserResDTO> {
+    const testNickName = '1';
+    return this.userService.modifyNickName(testNickName, nickname);
   }
 
   @Put('/profile')
@@ -48,3 +49,6 @@ export class UserController {
     return 'edit profile image';
   }
 }
+// function email(email: any): UserResDTO {
+//   throw new Error('Function not implemented.');
+// }

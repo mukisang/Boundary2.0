@@ -23,8 +23,18 @@ export class UserService {
     return await this.usersRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.usersRepository.find();
+  async find(email: string): Promise<UserResDTO> {
+    const userFind: UserEntity = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    if (!userFind) {
+      throw new UnauthorizedException();
+    }
+    const res: UserResDTO = {
+      nickname: userFind.nickname,
+      email: userFind.email,
+    };
+    return res;
   }
 
   async validateUser(email: string, password: string): Promise<UserResDTO> {
@@ -40,5 +50,14 @@ export class UserService {
       email: userFind.email,
     };
     return res;
+  }
+
+  async modifyNickName(email: string, nickname: string): Promise<UserResDTO> {
+    const userFind: UserEntity = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    userFind.nickname = nickname;
+    await this.usersRepository.save(userFind);
+    return userFind;
   }
 }
