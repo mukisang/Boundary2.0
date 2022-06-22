@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './interface/user.interface';
 import { UserResDTO } from './dto/userRes.dto';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -30,11 +31,11 @@ export class UserService {
     if (!userFind) {
       throw new UnauthorizedException();
     }
-    const res: UserResDTO = {
+    return {
       nickname: userFind.nickname,
       email: userFind.email,
+      profileImage: userFind.profileImage,
     };
-    return res;
   }
 
   async validateUser(email: string, password: string): Promise<UserResDTO> {
@@ -45,11 +46,11 @@ export class UserService {
     if (!userFind || !validatePassword) {
       throw new UnauthorizedException();
     }
-    const res: UserResDTO = {
+    return {
       nickname: userFind.nickname,
       email: userFind.email,
+      profileImage: userFind.profileImage,
     };
-    return res;
   }
 
   async modifyNickName(email: string, nickname: string): Promise<UserResDTO> {
@@ -58,6 +59,27 @@ export class UserService {
     });
     userFind.nickname = nickname;
     await this.usersRepository.save(userFind);
+    return userFind;
+  }
+
+  async modifyProfile(email: string, file): Promise<UserResDTO> {
+    const userFind: UserEntity = await this.usersRepository.findOneBy({
+      email: email,
+    });
+    if (!userFind) {
+      throw new UnauthorizedException();
+    }
+    if (userFind.profileImage != 'NULL') {
+      fs.unlink('profiles/' + userFind.profileImage, (error) => {
+        if (error) {
+          console.log(error);
+          console.log('no existing profile match with fs');
+        }
+      });
+    }
+    userFind.profileImage = file.filename;
+    await this.usersRepository.save(userFind);
+    userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     return userFind;
   }
 }

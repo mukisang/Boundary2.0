@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+// eslint-disable-next-line prettier/prettier
+import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './interface/user.interface';
-import { UserEntity } from './entity/user.entity';
 import { UserResDTO } from './dto/userRes.dto';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from './lib/multer.options';
 
 @Controller('user')
 export class UserController {
@@ -45,10 +47,9 @@ export class UserController {
   }
 
   @Put('/profile')
-  editProfileImage(): string {
-    return 'edit profile image';
+  @UseInterceptors(FileInterceptor('file', multerOptions))
+  editProfileImage(@UploadedFile() file): Promise<UserResDTO> {
+    console.log(file);
+    return this.userService.modifyProfile('1', file);
   }
 }
-// function email(email: any): UserResDTO {
-//   throw new Error('Function not implemented.');
-// }
