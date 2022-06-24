@@ -1,10 +1,11 @@
 // eslint-disable-next-line prettier/prettier
-import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './interface/user.interface';
 import { UserResDTO } from './dto/userRes.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './lib/multer.options';
+import { UserRequest } from './interface/userRequest.interface';
 
 @Controller('user')
 export class UserController {
@@ -17,21 +18,30 @@ export class UserController {
   }
 
   @Post('signin')
-  signIn(
+  async signIn(
+    @Req() req: UserRequest,
     @Body('email') email: string,
     @Body('password') password: string,
   ): Promise<UserResDTO> {
-    return this.userService.validateUser(email, password);
+    const signInDTO = await this.userService.validateUser(email, password);
+    req.session.key = signInDTO.sessionID;
+    return {
+      nickname: signInDTO.nickname,
+      email: email,
+      profileImage: signInDTO.profileImage,
+    };
   }
 
   @Post('signout')
-  signOut(): string {
-    return '3';
+  signOut(@Req() req: UserRequest): any {
+    req.session.destroy();
+    // req.clearCookie('connect.sid');
+    return { message: 'complete done' };
   }
 
   @Get('/')
-  showMyProfile(): Promise<UserResDTO> {
-    const email = '1';
+  showMyProfile(@Req() req: UserRequest): Promise<UserResDTO> {
+    const email = req.session.key;
     return this.userService.find(email);
   }
 
@@ -41,15 +51,21 @@ export class UserController {
   }
 
   @Put('/')
-  editNickName(@Body('nickname') nickname: string): Promise<UserResDTO> {
-    const testNickName = '1';
-    return this.userService.modifyNickName(testNickName, nickname);
+  editNickName(
+    @Req() req: UserRequest,
+    @Body('nickname') nickname: string,
+  ): Promise<UserResDTO> {
+    const email = req.session.key;
+    return this.userService.modifyNickName(email, nickname);
   }
 
   @Put('/profile')
   @UseInterceptors(FileInterceptor('file', multerOptions))
-  editProfileImage(@UploadedFile() file): Promise<UserResDTO> {
-    console.log(file);
-    return this.userService.modifyProfile('1', file);
+  editProfileImage(
+    @Req() req: UserRequest,
+    @UploadedFile() file,
+  ): Promise<UserResDTO> {
+    const email = req.session.key;
+    return this.userService.modifyProfile(email, file);
   }
 }

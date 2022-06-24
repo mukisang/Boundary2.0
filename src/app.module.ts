@@ -5,9 +5,9 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user/entity/user.entity';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { UserController } from './user/user.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AuthMiddleware } from './middleware/auth.middleware';
 
 @Module({
   imports: [
@@ -31,12 +31,13 @@ import { join } from 'path';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
     consumer
-      .apply(LoggerMiddleware)
+      .apply(AuthMiddleware)
       .exclude(
         { path: 'user/signup', method: RequestMethod.POST },
         { path: 'user/signin', method: RequestMethod.POST },
       )
-      .forRoutes(UserController);
+      .forRoutes('*');
   }
 }

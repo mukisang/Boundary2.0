@@ -6,6 +6,8 @@ import { User } from './interface/user.interface';
 import { UserResDTO } from './dto/userRes.dto';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
+import { SignInDTO } from './dto/signIn.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UserService {
@@ -31,6 +33,7 @@ export class UserService {
     if (!userFind) {
       throw new UnauthorizedException();
     }
+    userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     return {
       nickname: userFind.nickname,
       email: userFind.email,
@@ -38,7 +41,7 @@ export class UserService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<UserResDTO> {
+  async validateUser(email: string, password: string): Promise<SignInDTO> {
     const userFind: UserEntity = await this.usersRepository.findOneBy({
       email: email,
     });
@@ -48,8 +51,8 @@ export class UserService {
     }
     return {
       nickname: userFind.nickname,
-      email: userFind.email,
       profileImage: userFind.profileImage,
+      sessionID: email,
     };
   }
 
@@ -59,7 +62,12 @@ export class UserService {
     });
     userFind.nickname = nickname;
     await this.usersRepository.save(userFind);
-    return userFind;
+    userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
+    return {
+      nickname: userFind.nickname,
+      email: userFind.email,
+      profileImage: userFind.profileImage,
+    };
   }
 
   async modifyProfile(email: string, file): Promise<UserResDTO> {
@@ -80,6 +88,10 @@ export class UserService {
     userFind.profileImage = file.filename;
     await this.usersRepository.save(userFind);
     userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
-    return userFind;
+    return {
+      nickname: userFind.nickname,
+      email: userFind.email,
+      profileImage: userFind.profileImage,
+    };
   }
 }
