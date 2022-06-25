@@ -39,11 +39,17 @@ export class RoomService {
       type: 'Point',
       coordinates: [longitude, latitude],
     };
-    const room = await this.roomsRepository.create({
-      title: title,
-      location: loc,
-      generator: userFind,
-    });
+    const result = await this.roomsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(RoomEntity)
+      .values({
+        title: title,
+        location: () =>
+          `ST_GeomFromText('POINT(${latitude} ${longitude})', 4326)`,
+        generator: userFind,
+      })
+      .execute();
     userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     const generator: UserResDTO = {
       nickname: userFind.nickname,
@@ -51,10 +57,33 @@ export class RoomService {
       profileImage: userFind.profileImage,
     };
     return {
-      id: room.id,
-      title: room.title,
-      location: room.location,
+      id: result.raw.insertId,
+      title: title,
+      location: loc,
       generator: generator,
     };
+  }
+
+  async find(latitude: number, longitude: number): Promise<RoomDTO[]> {
+    const origin = {
+      type: 'Point',
+      coordinates: [longitude, latitude],
+    };
+    const rooms: RoomEntity[] = await this.roomsRepository
+      .createQueryBuilder('room_entity')
+      .select([
+        'ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON(:origin), ST_SRID(rooms)))/1000 AS distance',
+      ])
+      .where(
+        'ST_DWithin(location, ST_SetSRID(ST_GeomFromGeoJSON(:origin), ST_SRID(rooms)) ,:range)',
+      )
+      .orderBy('distance', 'ASC')
+      .setParameters({
+        // stringify GeoJSON
+        origin: JSON.stringify(origin),
+        range: 1000, //KM conversion
+      })
+      .getRawMany();
+    return rooms;
   }
 }
