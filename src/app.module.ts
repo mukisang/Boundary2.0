@@ -8,7 +8,8 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AuthMiddleware } from './middleware/auth.middleware';
-
+import { RoomModule } from './room/room.module';
+import { RoomEntity } from './room/entity/room.entity';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -21,10 +22,11 @@ import { AuthMiddleware } from './middleware/auth.middleware';
       username: 'root',
       password: 'root',
       database: 'boundary',
-      entities: [UserEntity],
+      entities: [UserEntity, RoomEntity],
       synchronize: true,
     }),
     UserModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],

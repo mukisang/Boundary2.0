@@ -7,7 +7,6 @@ import { UserResDTO } from './dto/userRes.dto';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import { SignInDTO } from './dto/signIn.dto';
-import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UserService {
@@ -47,8 +46,9 @@ export class UserService {
     });
     const validatePassword = await bcrypt.compare(password, userFind.password);
     if (!userFind || !validatePassword) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Sign In Failed');
     }
+    userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     return {
       nickname: userFind.nickname,
       profileImage: userFind.profileImage,
