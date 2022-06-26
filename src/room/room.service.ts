@@ -35,6 +35,8 @@ export class RoomService {
     if (userFind.isGenerator) {
       throw new NotAcceptableException('generator already has rooms');
     }
+    userFind.isGenerator = true;
+    await this.usersRepository.save(userFind);
     const loc: Geometry = {
       type: 'Point',
       coordinates: [longitude, latitude],

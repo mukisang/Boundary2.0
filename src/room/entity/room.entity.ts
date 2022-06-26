@@ -20,7 +20,7 @@ export class RoomEntity {
   })
   location: Point;
 
-  @ManyToOne(() => UserEntity)
+  @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'user_entity_id' })
   generator: UserEntity;
 }
