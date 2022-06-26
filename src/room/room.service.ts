@@ -39,6 +39,7 @@ export class RoomService {
       type: 'Point',
       coordinates: [longitude, latitude],
     };
+    console.log(userFind);
     const result = await this.roomsRepository
       .createQueryBuilder()
       .insert()
@@ -46,7 +47,7 @@ export class RoomService {
       .values({
         title: title,
         location: () =>
-          `ST_GeomFromText('POINT(${latitude} ${longitude})', 4326)`,
+          `ST_GeomFromText('POINT(${longitude} ${latitude})', 4326)`,
         generator: userFind,
       })
       .execute();
@@ -65,25 +66,17 @@ export class RoomService {
   }
 
   async find(latitude: number, longitude: number): Promise<RoomDTO[]> {
-    const origin = {
-      type: 'Point',
-      coordinates: [longitude, latitude],
-    };
+    const range = 1000;
     const rooms: RoomEntity[] = await this.roomsRepository
       .createQueryBuilder('room_entity')
-      .select([
-        'ST_Distance(location, ST_SetSRID(ST_GeomFromGeoJSON(:origin), ST_SRID(rooms)))/1000 AS distance',
-      ])
-      .where(
-        'ST_DWithin(location, ST_SetSRID(ST_GeomFromGeoJSON(:origin), ST_SRID(rooms)) ,:range)',
+      .select()
+      .addSelect(
+        `ST_DISTANCE_SPHERE(POINT(${longitude} , ${latitude}), location) as distance`,
       )
+      // .leftJoinAndSelect('room_entity.generator', 'user_entity')
+      .having(`distance <= ${range}`)
       .orderBy('distance', 'ASC')
-      .setParameters({
-        // stringify GeoJSON
-        origin: JSON.stringify(origin),
-        range: 1000, //KM conversion
-      })
-      .getRawMany();
+      .getMany();
     return rooms;
   }
 }

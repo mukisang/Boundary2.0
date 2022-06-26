@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import { Entity, Column, PrimaryGeneratedColumn, Index, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index, OneToOne, JoinColumn } from 'typeorm';
 import { Point } from 'geojson';
 import { UserEntity } from 'src/user/entity/user.entity';
 
@@ -21,5 +21,6 @@ export class RoomEntity {
   location: Point;
 
   @OneToOne(() => UserEntity)
+  @JoinColumn()
   generator: UserEntity;
 }
