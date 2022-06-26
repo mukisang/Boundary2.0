@@ -25,7 +25,8 @@ export class RoomController {
   searchChatRoom(
     @Query('latitude') latitude,
     @Query('longitude') longitude,
+    @Query('page') page,
   ): Promise<RoomDTO[]> {
-    return this.roomService.find(latitude, longitude);
+    return this.roomService.find(latitude, longitude, page);
   }
 }

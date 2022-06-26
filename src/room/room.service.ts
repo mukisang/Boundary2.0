@@ -19,7 +19,7 @@ export class RoomService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
   ) {}
-
+  PAGECNT = 2;
   async create(
     email: string,
     title: string,
@@ -65,8 +65,19 @@ export class RoomService {
     };
   }
 
-  async find(latitude: number, longitude: number): Promise<RoomDTO[]> {
-    const range = 1000;
+  async find(
+    latitude: number,
+    longitude: number,
+    page: number,
+  ): Promise<RoomDTO[]> {
+    const range = 1000000;
+    let skip = 0;
+    if (page || page >= 1) {
+      skip = (page - 1) * this.PAGECNT;
+    } else {
+      skip = 0;
+    }
+
     const rooms: RoomEntity[] = await this.roomsRepository
       .createQueryBuilder('room_entity')
       .select()
@@ -76,6 +87,8 @@ export class RoomService {
       // .leftJoinAndSelect('room_entity.generator', 'user_entity')
       .having(`distance <= ${range}`)
       .orderBy('distance', 'ASC')
+      .limit(this.PAGECNT)
+      .offset(skip)
       .getMany();
     return rooms;
   }

@@ -21,6 +21,6 @@ export class RoomEntity {
   location: Point;
 
   @OneToOne(() => UserEntity)
-  @JoinColumn()
+  // @JoinColumn()
   generator: UserEntity;
 }
