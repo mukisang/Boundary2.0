@@ -13,7 +13,6 @@
   + 파일 이름 : 시간 -> UUID
 
 - 추후
-  + controller 요청들에서 sessionid를 통한 email 추출
   + 환경변수 모으기
   + Guard, Passport
   + 없는 세션 ID 호출시 방어(jwt 이용?)
