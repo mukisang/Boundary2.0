@@ -1,11 +1,11 @@
 // eslint-disable-next-line prettier/prettier
-import { Entity, Column, PrimaryGeneratedColumn, Index, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Index, OneToOne, JoinColumn, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
 import { Point } from 'geojson';
 import { UserEntity } from 'src/user/entity/user.entity';
 
 @Entity()
 export class RoomEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: string;
 
   @Column()
@@ -20,7 +20,7 @@ export class RoomEntity {
   })
   location: Point;
 
-  @OneToOne(() => UserEntity)
-  // @JoinColumn()
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'user_entity_id' })
   generator: UserEntity;
 }

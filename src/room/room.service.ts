@@ -39,7 +39,6 @@ export class RoomService {
       type: 'Point',
       coordinates: [longitude, latitude],
     };
-    console.log(userFind);
     const result = await this.roomsRepository
       .createQueryBuilder()
       .insert()
@@ -78,18 +77,37 @@ export class RoomService {
       skip = 0;
     }
 
-    const rooms: RoomEntity[] = await this.roomsRepository
+    const rooms: RoomDTO[] = await this.roomsRepository
       .createQueryBuilder('room_entity')
-      .select()
+      .select([
+        'room_entity.id',
+        'room_entity.title',
+        'room_entity.location',
+        'user_entity.nickname',
+        'user_entity.email',
+        'user_entity.profileImage',
+      ])
       .addSelect(
         `ST_DISTANCE_SPHERE(POINT(${longitude} , ${latitude}), location) as distance`,
       )
-      // .leftJoinAndSelect('room_entity.generator', 'user_entity')
+      .leftJoinAndSelect('room_entity.generator', 'user_entity')
       .having(`distance <= ${range}`)
       .orderBy('distance', 'ASC')
       .limit(this.PAGECNT)
       .offset(skip)
       .getMany();
+    rooms.map((room: RoomDTO) => {
+      if (room.generator && room.generator.profileImage) {
+        room.generator.profileImage =
+          'http://127.0.0.1:3000/' + room.generator.profileImage;
+      }
+      const roomRes: UserResDTO = {
+        nickname: room.generator.nickname,
+        email: room.generator.email,
+        profileImage: room.generator.profileImage,
+      };
+      room.generator = roomRes;
+    });
     return rooms;
   }
 }
