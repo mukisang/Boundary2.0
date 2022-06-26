@@ -1,6 +1,17 @@
 # Boundary ver2.0 최적의 서버를 향하여
 - 2022.06 ~
+- Refactoring
+  - 코드 리펙토링(중복 제거 및 공통 함수 분배)
+  - promise.then -> async await
+  - type script 변환
+  - Nest.js 프레임워크 사용
+    
+- Development
+  - 로그아웃 로직 추가
+  - Pagenation 추가
+  - 세션을 통한 인증 로직 변경
 
+---
 1. Prototyping
 2. 비밀번호 암호화
 3. multer 모듈로 파일 받기
