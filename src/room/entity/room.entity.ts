@@ -5,8 +5,11 @@ import { UserEntity } from 'src/user/entity/user.entity';
 
 @Entity()
 export class RoomEntity {
-  @PrimaryGeneratedColumn('increment')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  roomId: string;
 
   @Column()
   title: string;

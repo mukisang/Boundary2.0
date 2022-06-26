@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+// eslint-disable-next-line prettier/prettier
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +8,7 @@ import { UserResDTO } from './dto/userRes.dto';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 import { SignInDTO } from './dto/signIn.dto';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -30,7 +32,7 @@ export class UserService {
       email: email,
     });
     if (!userFind) {
-      throw new UnauthorizedException();
+      throw new NotFoundException('User not found');
     }
     userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     return {
@@ -44,9 +46,12 @@ export class UserService {
     const userFind: UserEntity = await this.usersRepository.findOneBy({
       email: email,
     });
+    if (!userFind) {
+      throw new ForbiddenException('Sign in Failed');
+    }
     const validatePassword = await bcrypt.compare(password, userFind.password);
-    if (!userFind || !validatePassword) {
-      throw new UnauthorizedException('Sign In Failed');
+    if (!validatePassword) {
+      throw new ForbiddenException('Sign In Failed');
     }
     userFind.profileImage = 'http://127.0.0.1:3000/' + userFind.profileImage;
     return {

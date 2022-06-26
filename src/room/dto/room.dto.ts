@@ -2,7 +2,7 @@ import { Point } from 'geojson';
 import { UserResDTO } from 'src/user/dto/userRes.dto';
 
 export class RoomDTO {
-  id: string;
+  roomId: string;
   title: string;
   location: Point;
   generator: UserResDTO;
