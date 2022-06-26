@@ -23,10 +23,23 @@
   "dependencies": {
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/jwt": "^8.0.1",
     "@nestjs/platform-express": "^8.0.0",
+    "@nestjs/serve-static": "^2.2.2",
+    "@nestjs/typeorm": "^8.1.4",
+    "@types/bcrypt": "^5.0.0",
+    "@types/geojson": "^7946.0.8",
+    "@types/multer": "^1.4.7",
+    "@types/session-file-store": "^1.2.2",
+    "bcrypt": "^5.0.1",
+    "express-session": "^1.17.3",
+    "mysql2": "^2.3.3",
+    "postgres": "^3.2.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "session-file-store": "^1.5.0",
+    "typeorm": "^0.3.6"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
