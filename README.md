@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://user-images.githubusercontent.com/30883319/121801534-c77b0b80-cc72-11eb-8d72-193a9e24ee33.png">
+</p>
+
 # Boundary ver2.0 최적의 서버를 향하여
 - 2022.06 ~
 - Refactoring
