@@ -2,6 +2,9 @@
 <img src="https://user-images.githubusercontent.com/30883319/121801534-c77b0b80-cc72-11eb-8d72-193a9e24ee33.png">
 </p>
 
+#거리 기반 음성 채팅 웹앱
+- 10Km 이내의 거리에서 사람들이 방을 만들면 참여하여 음성으로 채팅이 가능한 어플리케이션
+
 # Boundary ver2.0 최적의 서버를 향하여
 - 2022.06 ~
 - Refactoring
